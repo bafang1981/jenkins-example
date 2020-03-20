@@ -1,32 +1,53 @@
 pipeline {
-    agent any
+        agent any
+                stages {
+                        stage ('One') {
+                                        echo 'Hi, this is Bafang'
+                        }
+                }
+                stage('Two') {
+                         steps {
+                                 input('Do you want to proceed?')
+                         }
+                }
+                                            
 
-    stages {
-        stage ('Compile Stage') {
+        stage ('Three') {
+            when {
+                not {
+                         branch "master"
+                }
+            }
 
             steps {
-                withMaven(maven : 'maven_3_5_0') {
-                    sh 'mvn clean compile'
+                   echo "Hello"
+                
+            }
+            }
+       
+        stage ('Four') {
+            parallel {
+                stage('unit test') {
+                                    steps {
+                                          echo "running the unit test... "
+                                    }
+                }
+                stage('integration test') {
+                    agent {
+                        docker {
+                            reuseNode false
+                            image 'ubuntu'
+                        }
+                    }
+                    steps {
+                        echo 'running the integration test ..'
+                    }
                 }
             }
         }
-
-        stage ('Testing Stage') {
-
-            steps {
-                withMaven(maven : 'maven_3_5_0') {
-                    sh 'mvn test'
-                }
-            }
-        }
-
-
-        stage ('Deployment Stage') {
-            steps {
-                withMaven(maven : 'maven_3_5_0') {
-                    sh 'mvn deploy'
-                }
-            }
-        }
-    }
 }
+}
+}
+                   
+                
+             
